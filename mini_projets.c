@@ -17,6 +17,7 @@ struct Contact {
 };
 struct Contact table[100];
 int cpt = 0;
+int id_counter = 1;
 
 void ajouter_contacts_defaut() {
     const char noms[10][20] = {
@@ -32,56 +33,58 @@ void ajouter_contacts_defaut() {
         "salma@gmail.com", "amal@gmail.com", "manal@gmail.com",
         "ahlam@gmail.com", "akram@gmail.com", "mouad@gmail.com",
         "oumaima@gmail.com", "hanane@gmail.com", "hamza@gmail.com",
-        "hamza@gmail.com"
+        "hamza2@gmail.com"
     };
     for (int i = 0; i < 10 && cpt < 100; i++) {
-        table[cpt].id = cpt + 1;
+        table[cpt].id = id_counter++;
         strcpy(table[cpt].name, noms[i]);
         strcpy(table[cpt].phone, telephones[i]);
         strcpy(table[cpt].email, emails[i]);
         cpt++;
     }
 
-    printf(GREEN "deja 10 contact sont ajouter par default.\n" RESET);
+    printf(GREEN "10 contacts ajoutés par défaut.\n" RESET);
 }
 
 void ajout_contact() {
     if (cpt >= 100) {
-        printf(RED "le Carnet est plein!!\n" RESET);
+        printf(RED "Le carnet est plein!\n" RESET);
         return;
     }
 
     struct Contact newContact;
-    newContact.id = cpt + 1;
-    printf("entrer le nom: ");
+    newContact.id = id_counter++;
+
+    printf("Entrer le nom: ");
     scanf("%s", newContact.name);
 
-    printf("entrer telephone: ");
+    printf("Entrer le téléphone: ");
     scanf("%s", newContact.phone);
 
     for (int i = 0; i < cpt; i++) {
         if (strcmp(table[i].phone, newContact.phone) == 0) {
-            printf(RED "ce numero est deja existe!!\n" RESET);
+            printf(RED "Ce numéro existe déjà!\n" RESET);
             return;
         }
     }
 
-    printf("entrer l\'email: ");
+    printf("Entrer l'email: ");
     scanf("%s", newContact.email);
 
     for (int i = 0; i < cpt; i++) {
         if (strcmp(table[i].email, newContact.email) == 0) {
-            printf(RED "l\'email que tu as saisit deja existe !!\n" RESET);
+            printf(RED "Cet email existe déjà!\n" RESET);
             return;
         }
     }
 
     table[cpt++] = newContact;
-    printf(GREEN "bien ajouté.\n" RESET);
+    printf(GREEN "Contact ajouté.\n" RESET);
 }
+
 void afficher_contacts() {
     if (cpt == 0) {
-        printf(RED "pas de contact!!\n" RESET);
+        printf(RED "Pas de contact!\n" RESET);
         return;
     }
 
@@ -96,9 +99,10 @@ void afficher_contacts() {
 
     printf("+-----+----------------+-------------+--------------------------+\n");
 }
+
 void rechercher_contact() {
     char search[15];
-    printf("entrer le telephone du contact a chercher: ");
+    printf("Entrer le téléphone du contact à chercher: ");
     scanf("%s", search);
 
     for (int i = 0; i < cpt; i++) {
@@ -113,7 +117,7 @@ void rechercher_contact() {
 
 void modifier_contact() {
     char search[15];
-    printf("Pour modifier les infos de contact, merci de saisir son numéro de téléphone: ");
+    printf("Pour modifier les infos du contact, merci de saisir son numéro de téléphone: ");
     scanf("%s", search);
 
     for (int i = 0; i < cpt; i++) {
@@ -129,7 +133,7 @@ void modifier_contact() {
 
             for (int j = 0; j < cpt; j++) {
                 if (strcmp(table[j].phone, newPhone) == 0 && j != i) {
-                    printf(RED "le numero est deja utilisé!!\n" RESET);
+                    printf(RED "Le numéro est déjà utilisé!\n" RESET);
                     return;
                 }
             }
@@ -139,7 +143,25 @@ void modifier_contact() {
             char newEmail[30];
             scanf("%s", newEmail);
             strcpy(table[i].email, newEmail);
-            printf(GREEN "Contact bien modifié.\n" RESET);
+            printf(GREEN "Contact modifié.\n" RESET);
+            return;
+        }
+    }
+    printf(RED "Contact non trouvé.\n" RESET);
+}
+
+void supprimer_contact() {
+    char search[15];
+    printf("Entrer le numéro de téléphone du contact à supprimer: ");
+    scanf("%s", search);
+
+    for (int i = 0; i < cpt; i++) {
+        if (strcmp(table[i].phone, search) == 0) {
+            for (int j = i; j < cpt - 1; j++) {
+                table[j] = table[j + 1];
+            }
+            cpt--;
+            printf(GREEN "Contact supprimé avec succès.\n" RESET);
             return;
         }
     }
@@ -154,8 +176,9 @@ int main() {
         printf(YELLOW "2. Afficher les contacts\n" RESET);
         printf(YELLOW "3. Rechercher un contact\n" RESET);
         printf(YELLOW "4. Modifier un contact\n" RESET);
-        printf(YELLOW "5. Quitter\n" RESET);
-        printf("Choisissez une option: " RESET);
+        printf(YELLOW "5. Supprimer un contact\n" RESET);
+        printf(YELLOW "6. Quitter\n" RESET);
+        printf("Choisissez une option: ");
         scanf("%d", &choix);
 
         switch (choix) {
@@ -172,13 +195,16 @@ int main() {
                 modifier_contact();
                 break;
             case 5:
+                supprimer_contact();
+                break;
+            case 6:
                 printf(GREEN "Au revoir!\n" RESET);
                 break;
             default:
                 printf(RED "Option invalide.\n" RESET);
         }
 
-    } while (choix != 5);
+    } while (choix != 6);
 
     return 0;
 }
